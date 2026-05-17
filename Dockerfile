@@ -4,14 +4,14 @@ FROM node:20-alpine as build-stage
 # Atur direktori kerja
 WORKDIR /app
 
-# Salin file package.json dan package-lock.json (jika ada)
-COPY package*.json ./
+# Salin file package.json dan package-lock.json dari dalam folder app_build
+COPY app_build/package*.json ./
 
 # Instal dependensi
 RUN npm ci
 
-# Salin seluruh source code
-COPY . .
+# Salin seluruh isi folder app_build ke dalam direktori kerja (/app)
+COPY app_build/ .
 
 # Jalankan build process (menghasilkan folder dist/)
 RUN npm run build
@@ -22,7 +22,7 @@ FROM nginx:alpine as production-stage
 # Hapus konfigurasi default nginx
 RUN rm /etc/nginx/conf.d/default.conf
 
-# Salin konfigurasi nginx kustom kita
+# Salin konfigurasi nginx kustom kita dari root
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
 # Salin hasil build dari tahap 1 ke direktori html Nginx
